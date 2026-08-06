@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Check, Loader2, Lock, CreditCard, Wallet, Smartphone, Apple, Tag, CheckCircle2, Gift } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { supabase } from '@/lib/supabase';
 import { useCurrency } from '@/context/CurrencyContext';
-import { checkGooglePayReady, requestGooglePayment } from '@/lib/googlePay';
 import type { Discount, ShopSettings } from '@/lib/types';
 
 interface CheckoutProps {
@@ -34,10 +33,6 @@ export default function Checkout({ open, onClose }: CheckoutProps) {
   const [giftMessage, setGiftMessage] = useState('');
   const GIFT_WRAP_COST = 5;
 
-  // Google Pay
-  const [googlePayReady, setGooglePayReady] = useState(false);
-  const googlePayChecked = useRef(false);
-
   // Discount
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState<Discount | null>(null);
@@ -51,11 +46,6 @@ export default function Checkout({ open, onClose }: CheckoutProps) {
     supabase.from('settings').select('*').eq('id', 1).maybeSingle().then(({ data }) => {
       if (data) setSettings(data as ShopSettings);
     });
-    // Check Google Pay readiness once
-    if (!googlePayChecked.current) {
-      googlePayChecked.current = true;
-      checkGooglePayReady().then(setGooglePayReady);
-    }
   }, []);
 
   useEffect(() => {
@@ -327,86 +317,7 @@ export default function Checkout({ open, onClose }: CheckoutProps) {
                   </div>
                 )}
 
-                {payment === 'google' && (
-                  <div className="mt-3 animate-fade-in space-y-3">
-                    {googlePayReady ? (
-                      <>
-                        <div className="rounded-xl border border-white/8 bg-ink-800/50 px-4 py-3 text-xs text-ink-400">
-                          Click <strong className="text-white">Pay with Google Pay</strong> below to open the secure Google Pay payment sheet. Your card details are handled entirely by Google.
-                        </div>
-                        <button
-                          type="button"
-                          id="google-pay-btn"
-                          onClick={async () => {
-                            if (!form.name || !form.email || !form.address) {
-                              setError('Please fill in name, email and address before paying.');
-                              return;
-                            }
-                            setStatus('loading');
-                            setError('');
-                            const result = await requestGooglePayment(total.toFixed(2), 'USD');
-                            if (result.success) {
-                              // Proceed to insert order
-                              const { error: insertError } = await supabase.from('orders').insert({
-                                customer_name: form.name,
-                                customer_email: form.email,
-                                shipping_address: form.address,
-                                items: items.map((item) => ({ product_id: item.product.id, name: item.product.name, size: item.size, color: item.color.name, quantity: item.quantity, price: item.product.price })),
-                                total,
-                                discount_code: appliedDiscount?.code ?? null,
-                                discount_amount: discountAmount,
-                                gift_wrap: giftWrap,
-                                gift_message: giftWrap ? giftMessage : null,
-                                status: 'pending',
-                              });
-                              if (insertError) {
-                                setStatus('error');
-                                setError(insertError.message);
-                              } else {
-                                setStatus('success');
-                                clear();
-                                setAppliedDiscount(null);
-                                setDiscountCode('');
-                                setGiftWrap(false);
-                                setGiftMessage('');
-                                setTimeout(() => { onClose(); setForm({ name: '', email: '', address: '' }); }, 2500);
-                              }
-                            } else {
-                              setStatus('idle');
-                              if (result.error !== 'Payment cancelled.') setError(result.error);
-                            }
-                          }}
-                          disabled={status === 'loading'}
-                          className="flex w-full items-center justify-center gap-3 rounded-xl py-3.5 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
-                          style={{ background: '#000', border: '1px solid #3c4043' }}
-                        >
-                          {status === 'loading' ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <>
-                              {/* Google Pay SVG logo */}
-                              <svg viewBox="0 0 41 17" className="h-5" aria-hidden="true">
-                                <path d="M19.526 2.635v4.083h2.518c.6 0 1.096-.202 1.488-.605.403-.402.605-.882.605-1.437 0-.544-.202-1.018-.605-1.422-.392-.413-.888-.62-1.488-.62h-2.518zm0 5.52v4.736h-1.504V1.198h3.99c1.013 0 1.873.337 2.582 1.012.72.675 1.08 1.497 1.08 2.466 0 .991-.36 1.819-1.08 2.482-.697.652-1.559.978-2.583.978h-2.485zm7.668 2.287c0 .56.187 1.032.56 1.404.382.372.828.559 1.34.559.73 0 1.325-.285 1.786-.854l.963.62c-.678.97-1.643 1.455-2.897 1.455-1.058 0-1.935-.337-2.628-1.012-.692-.685-1.038-1.547-1.038-2.588 0-1.025.337-1.88 1.012-2.565.684-.697 1.54-1.046 2.566-1.046 1.073 0 1.925.38 2.554 1.142l-.963.62c-.44-.56-.995-.84-1.664-.84-.536 0-.99.19-1.36.57-.37.38-.556.867-.556 1.472zm7.45 1.88l1.8-4.94h1.63l-3.04 7.82c-.564 1.507-1.492 2.26-2.784 2.26-.36 0-.707-.057-1.038-.17v-1.314c.27.1.555.15.855.15.64 0 1.09-.3 1.35-.9l.227-.527-2.703-7.32h1.683l2.02 4.94z" fill="#fff"/>
-                                <path d="M13.24 8.366c0-.446-.04-.876-.115-1.29H6.882v2.44h3.58c-.155.832-.625 1.538-1.33 2.01v1.667h2.154c1.26-1.16 1.988-2.869 1.988-4.827z" fill="#4285F4"/>
-                                <path d="M6.882 13.857c1.8 0 3.31-.597 4.412-1.614L9.14 10.575c-.598.4-1.362.636-2.258.636-1.737 0-3.208-1.173-3.732-2.75H.928v1.72a6.667 6.667 0 005.954 3.676z" fill="#34A853"/>
-                                <path d="M3.15 8.46a4.01 4.01 0 010-2.553V4.188H.928a6.667 6.667 0 000 5.99L3.15 8.46z" fill="#FBBC05"/>
-                                <path d="M6.882 3.157c.978 0 1.855.336 2.546 1l1.908-1.908C10.187 1.19 8.68.524 6.882.524A6.667 6.667 0 00.928 4.188l2.222 1.72c.524-1.578 1.995-2.75 3.732-2.75z" fill="#EA4335"/>
-                              </svg>
-                              <span>Pay with Google Pay</span>
-                            </>
-                          )}
-                        </button>
-                      </>
-                    ) : (
-                      <div className="rounded-xl border border-white/8 bg-ink-800/50 px-4 py-3 text-sm text-ink-400 animate-fade-in">
-                        <p className="font-medium text-ink-200">Google Pay is not available</p>
-                        <p className="mt-1 text-xs">Your browser or device may not support Google Pay. Please choose another payment method.</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {payment !== 'card' && payment !== 'google' && (
+                {payment !== 'card' && (
                   <div className="mt-3 rounded-xl border border-white/8 bg-ink-800/50 px-4 py-3 text-sm text-ink-400 animate-fade-in">
                     You'll be redirected to {PAYMENT_METHODS.find((m) => m.id === payment)?.label} to complete your payment securely.
                   </div>

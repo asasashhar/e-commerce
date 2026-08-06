@@ -1,98 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight, Camera, Loader2 } from 'lucide-react';
 import { useReveal } from '@/hooks/useReveal';
 import { supabase } from '@/lib/supabase';
-
-const PHOTOS = [
-  {
-    src: 'https://images.pexels.com/photos/1464625/pexels-photo-1464625.jpeg?auto=compress&cs=tinysrgb&w=800',
-    alt: 'Street style sneakers',
-    span: 'row-span-2',
-  },
-  {
-    src: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=800',
-    alt: 'Running shoes on track',
-    span: '',
-  },
-  {
-    src: 'https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg?auto=compress&cs=tinysrgb&w=800',
-    alt: 'Lifestyle sneakers',
-    span: '',
-  },
-  {
-    src: 'https://images.pexels.com/photos/3316924/pexels-photo-3316924.jpeg?auto=compress&cs=tinysrgb&w=800',
-    alt: 'Athletic shoes in motion',
-    span: 'row-span-2',
-  },
-  {
-    src: 'https://images.pexels.com/photos/1456706/pexels-photo-1456706.jpeg?auto=compress&cs=tinysrgb&w=800',
-    alt: 'Casual shoe style',
-    span: '',
-  },
-  {
-    src: 'https://images.pexels.com/photos/2562992/pexels-photo-2562992.png?auto=compress&cs=tinysrgb&w=800',
-    alt: 'Outdoor shoes',
-    span: '',
-  },
-  {
-    src: 'https://images.pexels.com/photos/1082528/pexels-photo-1082528.jpeg?auto=compress&cs=tinysrgb&w=800',
-    alt: 'Fashion sneakers on feet',
-    span: 'row-span-2',
-  },
-  {
-    src: 'https://images.pexels.com/photos/1546003/pexels-photo-1546003.jpeg?auto=compress&cs=tinysrgb&w=800',
-    alt: 'White sneakers closeup',
-    span: '',
-  },
-  {
-    src: 'https://images.pexels.com/photos/2048548/pexels-photo-2048548.jpeg?auto=compress&cs=tinysrgb&w=800',
-    alt: 'Colorful shoes collection',
-    span: '',
-  },
-];
-
-const FALLBACK_PHOTOS = [
-  { src: 'https://images.pexels.com/photos/1464625/pexels-photo-1464625.jpeg?auto=compress&cs=tinysrgb&w=800', alt: 'Street style sneakers', span: 'row-span-2' },
-  { src: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=800', alt: 'Running shoes on track', span: '' },
-  { src: 'https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg?auto=compress&cs=tinysrgb&w=800', alt: 'Lifestyle sneakers', span: '' },
-  { src: 'https://images.pexels.com/photos/3316924/pexels-photo-3316924.jpeg?auto=compress&cs=tinysrgb&w=800', alt: 'Athletic shoes in motion', span: 'row-span-2' },
-  { src: 'https://images.pexels.com/photos/1456706/pexels-photo-1456706.jpeg?auto=compress&cs=tinysrgb&w=800', alt: 'Casual shoe style', span: '' },
-  { src: 'https://images.pexels.com/photos/2562992/pexels-photo-2562992.png?auto=compress&cs=tinysrgb&w=800', alt: 'Outdoor shoes', span: '' },
-  { src: 'https://images.pexels.com/photos/1082528/pexels-photo-1082528.jpeg?auto=compress&cs=tinysrgb&w=800', alt: 'Fashion sneakers on feet', span: 'row-span-2' },
-  { src: 'https://images.pexels.com/photos/1546003/pexels-photo-1546003.jpeg?auto=compress&cs=tinysrgb&w=800', alt: 'White sneakers closeup', span: '' },
-  { src: 'https://images.pexels.com/photos/2048548/pexels-photo-2048548.jpeg?auto=compress&cs=tinysrgb&w=800', alt: 'Colorful shoes collection', span: '' },
-];
+import type { LookbookItem } from '@/lib/types';
 
 interface LookbookProps {
   onBack: () => void;
 }
 
 export default function Lookbook({ onBack }: LookbookProps) {
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [dbLoading, setDbLoading] = useState(true);
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [photos, setPhotos] = useState<LookbookItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const { ref, visible } = useReveal<HTMLDivElement>();
 
   useEffect(() => {
-    supabase
-      .from('lookbook_items')
-      .select('src, alt, span')
-      .eq('active', true)
-      .order('sort_order', { ascending: true })
-      .then(({ data, error }) => {
-        if (error || !data || data.length === 0) {
-          setPhotos(FALLBACK_PHOTOS);
-        } else {
-          setPhotos(data as Photo[]);
-        }
-        setDbLoading(false);
-      });
+    const fetchLookbook = async () => {
+      const { data } = await supabase
+        .from('lookbook_items')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (data) {
+        setPhotos(data as LookbookItem[]);
+      }
+      setLoading(false);
+    };
+    fetchLookbook();
   }, []);
 
   const prev = () =>
     setLightbox((i) => (i === null ? null : (i - 1 + photos.length) % photos.length));
   const next = () =>
     setLightbox((i) => (i === null ? null : (i + 1) % photos.length));
+
+
 
   return (
     <div className="min-h-screen bg-ink-950">
@@ -124,38 +65,42 @@ export default function Lookbook({ onBack }: LookbookProps) {
 
       {/* Masonry grid */}
       <div ref={ref} className={`reveal ${visible ? 'is-visible' : ''} mx-auto max-w-7xl px-5 py-16 sm:px-8`}>
-        {dbLoading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-brand-400" />
-          </div>
-        ) : (
-          <div
-            className="grid gap-4"
-            style={{
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gridAutoRows: '280px',
-            }}
-          >
-            {photos.map((photo, i) => (
+        <div
+          className="grid gap-4"
+          style={{
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridAutoRows: '280px',
+          }}
+        >
+          {loading ? (
+            <div className="col-span-full flex justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-brand-500" />
+            </div>
+          ) : photos.length === 0 ? (
+            <div className="col-span-full text-center py-20 text-ink-400">
+              No photos available yet.
+            </div>
+          ) : (
+            photos.map((photo, i) => (
               <button
                 key={i}
                 onClick={() => setLightbox(i)}
                 className={`group relative overflow-hidden rounded-2xl ${photo.span} transition-transform duration-300 hover:scale-[1.02]`}
               >
                 <img
-                  src={photo.src}
-                  alt={photo.alt}
+                  src={photo.image_url}
+                  alt={photo.alt_text}
                   loading="lazy"
                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 <div className="absolute bottom-4 left-4 opacity-0 transition-all duration-300 group-hover:opacity-100">
-                  <p className="text-sm font-medium text-white">{photo.alt}</p>
+                  <p className="text-sm font-medium text-white">{photo.alt_text}</p>
                 </div>
               </button>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
       </div>
 
       {/* Lightbox */}
@@ -176,8 +121,8 @@ export default function Lookbook({ onBack }: LookbookProps) {
           </button>
 
           <img
-            src={photos[lightbox]?.src ?? ''}
-            alt={photos[lightbox]?.alt ?? ''}
+            src={photos[lightbox].image_url}
+            alt={photos[lightbox].alt_text}
             className="max-h-[85vh] max-w-[85vw] animate-scale-in rounded-2xl object-contain shadow-2xl"
           />
 

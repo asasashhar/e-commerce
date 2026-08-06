@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LogOut, Package, ClipboardList, Tag, Settings, BarChart3, Users, Camera } from 'lucide-react';
+import { LogOut, Package, ClipboardList, Tag, Settings, Store, BarChart3, Users, Camera } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import AdminOrders from './AdminOrders';
 import AdminProducts from './AdminProducts';
@@ -12,13 +12,13 @@ import AdminLookbook from './AdminLookbook';
 type Tab = 'orders' | 'products' | 'discounts' | 'analytics' | 'customers' | 'settings' | 'lookbook';
 
 const TABS: { id: Tab; label: string; icon: typeof Package }[] = [
-  { id: 'analytics',  label: 'Analytics',  icon: BarChart3     },
-  { id: 'orders',     label: 'Orders',     icon: ClipboardList },
-  { id: 'products',   label: 'Products',   icon: Package       },
-  { id: 'customers',  label: 'Customers',  icon: Users         },
-  { id: 'discounts',  label: 'Discounts',  icon: Tag           },
-  { id: 'lookbook',   label: 'Lookbook',   icon: Camera        },
-  { id: 'settings',   label: 'Settings',   icon: Settings      },
+  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+  { id: 'orders', label: 'Orders', icon: ClipboardList },
+  { id: 'products', label: 'Products', icon: Package },
+  { id: 'customers', label: 'Customers', icon: Users },
+  { id: 'lookbook', label: 'Lookbook', icon: Camera },
+  { id: 'discounts', label: 'Discounts', icon: Tag },
+  { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
 interface AdminDashboardProps {
@@ -56,7 +56,6 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              id={`admin-tab-${t.id}`}
               className={`flex items-center gap-2 whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-300 ${
                 tab === t.id
                   ? 'bg-white text-ink-950'
@@ -65,22 +64,19 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
             >
               <t.icon className="h-4 w-4" />
               {t.label}
-              {t.id === 'lookbook' && (
-                <span className="ml-1 rounded-full bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-bold text-brand-400">NEW</span>
-              )}
             </button>
           ))}
         </div>
 
         {/* Tab content */}
         <div className="mt-6 animate-fade-in">
-          {tab === 'analytics'  && <AdminAnalytics />}
-          {tab === 'orders'     && <AdminOrders />}
-          {tab === 'products'   && <AdminProducts />}
-          {tab === 'customers'  && <AdminCustomers />}
-          {tab === 'discounts'  && <AdminDiscounts />}
-          {tab === 'lookbook'   && <AdminLookbook />}
-          {tab === 'settings'   && <AdminSettings />}
+          { tab === 'analytics' && <AdminAnalytics /> }
+          { tab === 'orders' && <AdminOrders /> }
+          { tab === 'products' && <AdminProducts /> }
+          { tab === 'customers' && <AdminCustomers /> }
+          { tab === 'lookbook' && <AdminLookbook /> }
+          { tab === 'discounts' && <AdminDiscounts /> }
+          { tab === 'settings' && <AdminSettings /> }
         </div>
       </div>
     </div>
