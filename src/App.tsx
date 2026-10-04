@@ -21,8 +21,10 @@ import OrderTracking from '@/components/OrderTracking';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import WishlistDrawer from '@/components/WishlistDrawer';
 import Lookbook from '@/components/Lookbook';
+import PublicBranches from '@/components/PublicBranches';
+import StoreBranchesSection from '@/components/StoreBranchesSection';
 
-type Route = 'store' | 'admin' | 'track' | 'lookbook';
+type Route = 'store' | 'admin' | 'track' | 'lookbook' | 'branches';
 
 function useRoute(): [Route, (r: Route) => void] {
   const [route, setRoute] = useState<Route>(() => {
@@ -30,6 +32,7 @@ function useRoute(): [Route, (r: Route) => void] {
     if (hash === '#admin') return 'admin';
     if (hash === '#track') return 'track';
     if (hash === '#lookbook') return 'lookbook';
+    if (hash === '#branches') return 'branches';
     return 'store';
   });
 
@@ -39,6 +42,7 @@ function useRoute(): [Route, (r: Route) => void] {
       if (h === '#admin') setRoute('admin');
       else if (h === '#track') setRoute('track');
       else if (h === '#lookbook') setRoute('lookbook');
+      else if (h === '#branches') setRoute('branches');
       else setRoute('store');
     };
     window.addEventListener('hashchange', onHash);
@@ -104,6 +108,10 @@ function Store() {
     return <Lookbook onBack={() => navigate('store')} />;
   }
 
+  if (route === 'branches') {
+    return <PublicBranches onBack={() => navigate('store')} />;
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -131,6 +139,7 @@ function Store() {
         onAdmin={() => navigate('admin')}
         onTrack={() => navigate('track')}
         onLookbook={() => navigate('lookbook')}
+        onBranches={() => navigate('branches')}
         onWishlist={() => setWishlistOpen(true)}
       />
       <main>
@@ -140,9 +149,14 @@ function Store() {
         />
         <Marquee />
         <ProductGrid products={products} onQuickView={setQuickView} />
+        <StoreBranchesSection onExplore={() => navigate('branches')} />
         <Features />
       </main>
-      <Footer onAdmin={() => navigate('admin')} onTrack={() => navigate('track')} />
+      <Footer
+        onAdmin={() => navigate('admin')}
+        onTrack={() => navigate('track')}
+        onBranches={() => navigate('branches')}
+      />
 
       <QuickView product={quickView} onClose={() => setQuickView(null)} />
       <CartDrawer onCheckout={() => setCheckoutOpen(true)} />

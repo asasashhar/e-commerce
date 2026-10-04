@@ -25,7 +25,7 @@ export default function Features() {
     <section id="about" className="relative mx-auto max-w-7xl px-5 py-24 sm:px-8">
       <div ref={ref} className={`reveal ${visible ? 'is-visible' : ''}`}>
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-widest text-brand-400">Why {settings?.shop_name ?? 'STRIDE'}</p>
+          <p className="text-sm font-semibold uppercase tracking-widest text-brand-400">Why {settings?.shop_name ?? 'KINGWEAR'}</p>
           <h2 className="mt-2 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
             {settings?.about_title ?? 'Crafted For Every Move'}
           </h2>

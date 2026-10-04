@@ -9,9 +9,10 @@ const LINKS = {
 interface FooterProps {
   onAdmin?: () => void;
   onTrack?: () => void;
+  onBranches?: () => void;
 }
 
-export default function Footer({ onAdmin, onTrack }: FooterProps) {
+export default function Footer({ onAdmin, onTrack, onBranches }: FooterProps) {
   return (
     <footer className="relative overflow-hidden border-t border-white/10 bg-ink-950">
       <div className="pointer-events-none absolute -bottom-32 left-1/2 h-64 w-[600px] -translate-x-1/2 rounded-full bg-brand-600/10 blur-[120px]" />
@@ -21,7 +22,7 @@ export default function Footer({ onAdmin, onTrack }: FooterProps) {
           {/* Brand */}
           <div>
             <a href="#top" className="flex items-center gap-2">
-              <span className="font-display text-2xl font-bold text-white">STRIDE</span>
+              <span className="font-display text-2xl font-bold text-white">KINGWEAR</span>
               <span className="h-2 w-2 rounded-full bg-brand-500" />
             </a>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-400">
@@ -51,12 +52,21 @@ export default function Footer({ onAdmin, onTrack }: FooterProps) {
                 <ul className="mt-4 space-y-2.5">
                   {links.map((link) => (
                     <li key={link}>
-                      <a
-                        href="#"
-                        className="text-sm text-ink-300 transition-colors hover:text-white"
-                      >
-                        {link}
-                      </a>
+                      {link === 'Stores' && onBranches ? (
+                        <button
+                          onClick={onBranches}
+                          className="text-sm text-ink-300 transition-colors hover:text-white cursor-pointer text-left"
+                        >
+                          {link}
+                        </button>
+                      ) : (
+                        <a
+                          href="#"
+                          className="text-sm text-ink-300 transition-colors hover:text-white"
+                        >
+                          {link}
+                        </a>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -67,7 +77,7 @@ export default function Footer({ onAdmin, onTrack }: FooterProps) {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row">
           <p className="text-xs text-ink-500">
-            © {new Date().getFullYear()} STRIDE. All rights reserved.
+            © {new Date().getFullYear()} KINGWEAR. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <a href="#" className="text-xs text-ink-500 transition-colors hover:text-white">

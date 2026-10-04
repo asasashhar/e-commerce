@@ -70,7 +70,7 @@ export default function AdminLogin({ onBack }: AdminLoginProps) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@stride.com"
+                  placeholder="admin@kingwear.com"
                   required
                   className="w-full rounded-xl border border-white/10 bg-ink-800 py-3 pl-11 pr-4 text-sm text-white placeholder-ink-500 outline-none transition-colors focus:border-brand-500"
                 />

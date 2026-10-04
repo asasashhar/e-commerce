@@ -1,0 +1,7 @@
+{
+  "name": "STRIDE — Performance Footwear",
+  "description": "High-performance footwear e-commerce store with catalog, cart, checkout, order tracking, lookbook, and admin panel.",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

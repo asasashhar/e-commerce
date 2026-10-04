@@ -94,3 +94,20 @@ export interface LookbookItem {
   span: string;
   created_at: string;
 }
+
+export interface Branch {
+  id: string;
+  name: string;
+  city: string;
+  address: string;
+  phone: string;
+  email: string;
+  google_maps_url: string;
+  google_maps_embed?: string;
+  opening_hours: string;
+  images: string[];
+  is_flagship: boolean;
+  active: boolean;
+  created_at: string;
+}
+

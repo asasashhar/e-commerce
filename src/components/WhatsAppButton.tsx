@@ -24,7 +24,7 @@ export default function WhatsAppButton() {
 
   if (!show) return null;
 
-  const waLink = `https://wa.me/${phone || '923001234567'}?text=Hi%20STRIDE!%20I%20have%20a%20question%20about%20a%20product%20%F0%9F%91%9F`;
+  const waLink = `https://wa.me/${phone || '923001234567'}?text=Hi%20KINGWEAR!%20I%20have%20a%20question%20about%20a%20product%20%F0%9F%91%9F`;
 
   return (
     <>

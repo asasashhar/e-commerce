@@ -26,7 +26,7 @@ interface ProductForm {
 
 const EMPTY_FORM: ProductForm = {
   name: '',
-  brand: 'STRIDE',
+  brand: 'KINGWEAR',
   description: '',
   price: '',
   image_url: '',

@@ -52,13 +52,13 @@ export default function Lookbook({ onBack }: LookbookProps) {
         <div className="relative">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-ink-200 mb-4">
             <Camera className="h-3.5 w-3.5 text-brand-400" />
-            STRIDE Lookbook
+            KINGWEAR Lookbook
           </div>
           <h1 className="font-display text-5xl font-bold text-white sm:text-6xl">
-            Styled for the Streets
+            Styled for Royalty
           </h1>
           <p className="mx-auto mt-4 max-w-md text-ink-400">
-            Real shoes. Real style. See how the STRIDE collection looks in the wild.
+            Real shoes. Royal style. See how the KINGWEAR collection looks in the wild.
           </p>
         </div>
       </div>

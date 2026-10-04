@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ShoppingBag, Menu, X, ShieldCheck, Truck, Heart, Camera, Globe } from 'lucide-react';
+import { ShoppingBag, Menu, X, ShieldCheck, Truck, Heart, Camera, Globe, MapPin } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCurrency, CURRENCIES, type CurrencyCode } from '@/context/CurrencyContext';
@@ -14,10 +14,11 @@ interface NavbarProps {
   onAdmin?: () => void;
   onTrack?: () => void;
   onLookbook?: () => void;
+  onBranches?: () => void;
   onWishlist?: () => void;
 }
 
-export default function Navbar({ onAdmin, onTrack, onLookbook, onWishlist }: NavbarProps) {
+export default function Navbar({ onAdmin, onTrack, onLookbook, onBranches, onWishlist }: NavbarProps) {
   const { count, toggle } = useCart();
   const { count: wishCount } = useWishlist();
   const { currency, setCurrency } = useCurrency();
@@ -49,7 +50,7 @@ export default function Navbar({ onAdmin, onTrack, onLookbook, onWishlist }: Nav
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 sm:px-8">
         <a href="#top" className="flex items-center gap-2 group">
           <span className="font-display text-2xl font-bold tracking-tight text-white">
-            STRIDE
+            KINGWEAR
           </span>
           <span className="h-2 w-2 rounded-full bg-brand-500 transition-transform duration-300 group-hover:scale-150" />
         </a>
@@ -62,6 +63,14 @@ export default function Navbar({ onAdmin, onTrack, onLookbook, onWishlist }: Nav
           >
             Shop
           </a>
+          {onBranches && (
+            <button
+              onClick={onBranches}
+              className="flex items-center gap-1 relative text-sm font-medium text-ink-300 transition-colors hover:text-white cursor-pointer"
+            >
+              <MapPin className="h-3.5 w-3.5 text-brand-400" /> Stores
+            </button>
+          )}
           {onLookbook && (
             <button
               onClick={onLookbook}
@@ -176,6 +185,14 @@ export default function Navbar({ onAdmin, onTrack, onLookbook, onWishlist }: Nav
           >
             Shop
           </a>
+          {onBranches && (
+            <button
+              onClick={() => { onBranches(); setMobileOpen(false); }}
+              className="flex w-full items-center gap-2 py-3 text-base font-medium text-ink-200 transition-colors hover:text-white cursor-pointer"
+            >
+              <MapPin className="h-4 w-4 text-brand-400" /> Stores & Locations
+            </button>
+          )}
           {onLookbook && (
             <button
               onClick={() => { onLookbook(); setMobileOpen(false); }}
